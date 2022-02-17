@@ -53,7 +53,7 @@ app.ws('/video', function(ws, req) {
     });
 });
  
-app.listen(3000, ()=>{
-    console.log(`udp://${ip.address}:2222`, 'http://localhost:3000');
+app.listen(4000, ()=>{
+    console.log(`udp://${ip.address}:2222`, 'http://localhost:4000');
 });
 
