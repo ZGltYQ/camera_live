@@ -4,7 +4,7 @@ const websocketStream = require('websocket-stream/stream');
 const app = express();
 const os = require('os');
 const ifaces = os.networkInterfaces();
-const ip = ifaces.en0.find(face => face.family === 'IPv4');
+const ip = ifaces.ens160.find(face => face.family === 'IPv4');
 const cp = require('child_process');
 
 
