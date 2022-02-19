@@ -1,4 +1,4 @@
-const socket = new WebSocket('ws://localhost:3000/video')
+const socket = new WebSocket('ws://212.111.203.181/video')
 const player = document.getElementById('player');
 player.width = 640;
 player.height = 480;
