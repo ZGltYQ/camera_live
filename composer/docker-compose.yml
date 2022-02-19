@@ -1,0 +1,33 @@
+version: '3.7'
+
+networks:
+  default:
+    name: ntu-network
+
+services:
+  nginx-cam:
+    build: ../nginx/
+    container_name: nginx-cam
+    restart: always
+    environment:
+      TZ: ${TIMEZONE:-Europe/Kiev}
+      MODE: ${NGINX_MODE:-default}
+    volumes:
+      - ${PWD}/system/ssl:/etc/nginx/ssl
+      - ${PWD}/system/releases:/var/tmp/releases
+      - ${PWD}/system/releases-mobile:/var/www/static/releases-mobile
+      - ${PWD}/system/wizard-instructions:/var/www/static/wizard-instructions
+      - ${PWD}/system/shared/nginx:/var/tmp/shared
+    ports:
+      - 2222:2222/udp
+      - 80:80
+      
+
+  backend-cam:
+    build: ../be/
+    container_name: backend-cam
+    restart: always
+    volumes:
+      - ${PWD:-.}/system/storage:/app/storage
+      - ${PWD:-.}/system/ssl/certs:/app/etc/ssl/certs
+

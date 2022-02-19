@@ -1,7 +1,12 @@
 const socket = new WebSocket('ws://localhost:3000/video')
 const player = document.getElementById('player');
+player.width = 640;
+player.height = 480;
 var context = player.getContext('2d');
 var imageObj = new Image();
+
+
+
 
 socket.onmessage = function(event) {
     imageObj.src = URL.createObjectURL(event.data);

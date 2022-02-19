@@ -4,15 +4,14 @@ const websocketStream = require('websocket-stream/stream');
 const app = express();
 const os = require('os');
 const ifaces = os.networkInterfaces();
-const ip = ifaces.ens160.find(face => face.family === 'IPv4');
+const ip = Object.values(ifaces).flat().find(iface => iface.family === 'IPv4' && iface.internal === false);
 const cp = require('child_process');
-
 
 const ffmpeg = cp.spawn("ffmpeg", [
     "-re",
     "-y",
     "-i",
-    `udp://${ip.address}:2222?buffer_size=10000000?fifo_size=100000`,
+    `udp://localhost:2222?buffer_size=10000000?fifo_size=100000`,
     "-preset",
     "ultrafast",
     "-f",
@@ -53,7 +52,7 @@ app.ws('/video', function(ws, req) {
     });
 });
  
-app.listen(80, ()=>{
-    console.log(`udp://${ip.address}:2222`, 'http://localhost:80');
+app.listen(3000, ()=>{
+    console.log(`udp://localhost:2222`, 'http://localhost:3000');
 });
 
