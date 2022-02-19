@@ -19,6 +19,7 @@ services:
       - ${PWD}/system/wizard-instructions:/var/www/static/wizard-instructions
       - ${PWD}/system/shared/nginx:/var/tmp/shared
     ports:
+      - 2222:2222/udp
       - 80:80
       
 
@@ -29,6 +30,4 @@ services:
     volumes:
       - ${PWD:-.}/system/storage:/app/storage
       - ${PWD:-.}/system/ssl/certs:/app/etc/ssl/certs
-    ports:
-      - 2222:2222/udp
 
