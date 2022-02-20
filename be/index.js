@@ -24,7 +24,6 @@ ffmpeg.stderr.on("data", data => {
     console.log(Buffer.from(data).toString());
 });
 
-
 expressWebSocket(app, null, {
     perMessageDeflate: false,
 });

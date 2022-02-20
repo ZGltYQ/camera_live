@@ -9,7 +9,6 @@ RUN apk add ffmpeg
 COPY . /app
 
 
-ENV PORT=3000
 EXPOSE 3000
 EXPOSE 2222/udp
 
