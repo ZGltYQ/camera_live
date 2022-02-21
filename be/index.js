@@ -3,66 +3,68 @@ const expressWebSocket = require('express-ws');
 const websocketStream = require('websocket-stream/stream');
 const app = express();
 const cp = require('child_process');
-var udp = require('dgram');
+const udp = require('dgram');
 
-// --------------------creating a udp server --------------------
+// --------------------ffmpeg udp server --------------------
 
-// creating a udp server
-var server = udp.createSocket('udp4');
+const ffmpeg = cp.spawn("ffmpeg", [
+    "-re",
+    "-y",
+    "-i",
+    `udp://localhost:2222?buffer_size=900000?fifo_size=100000`,
+    "-preset",
+    "ultrafast",
+    "-f",
+    "mjpeg",
+    "pipe:1"
+]);
 
-// emits when any error occurs
-server.on('error',function(error){
-  console.log('Error: ' + error);
-  server.close();
+ffmpeg.on("error", error => {
+    console.log(`Error: ${error.message}`); 
+}); 
+
+ffmpeg.stderr.on("data", data => {
+    console.log(Buffer.from(data).toString());
 });
 
-// emits on new datagram msg
-server.on('message',function(msg,info){
-  console.log('Data received from client : ' + msg.toString());
-  console.log('Received %d bytes from %s:%d\n',msg.length, info.address, info.port);
 
-//sending msg
 
-});
+//  ---------------------------------------udp proxy-----------------------------------------
 
-//emits when socket is ready and listening for datagram msgs
-server.on('listening',function(){
-  var address = server.address();
-  var port = address.port;
-  var family = address.family;
-  var ipaddr = address.address;
-  console.log('Server is listening at port' + port);
-  console.log('Server ip :' + ipaddr);
-  console.log('Server is IP4/IP6 : ' + family);
-});
+// const server = udp.createSocket('udp4');
 
-//emits after the socket is closed using socket.close();
-server.on('close',function(){
-  console.log('Socket is closed !');
-});
 
-server.bind(2222);
-
-// const ffmpeg = cp.spawn("ffmpeg", [
-//     "-re",
-//     "-y",
-//     "-i",
-//     `udp://localhost:2222?buffer_size=900000?fifo_size=100000`,
-//     "-preset",
-//     "ultrafast",
-//     "-f",
-//     "mjpeg",
-//     "pipe:1"
-// ]);
-
-// ffmpeg.on("error", error => {
-//     console.log(`Error: ${error.message}`); 
-// }); 
-
-// ffmpeg.stderr.on("data", data => {
-//     console.log(Buffer.from(data).toString());
+// server.on('error', (error) => {
+//   console.log(error);
+//   server.close();
 // });
 
+// server.on('message', (msg, info) => {
+//     console.log('Data received from : ' + JSON.stringify(info));
+
+//     server.send(msg, 1111, 'localhost', (error) => {
+//           if (error) console.log(error);
+//     });
+  
+//   });
+
+
+// server.on('listening', () => {
+//   const address = server.address();
+//   console.log(`Server is listening at port: ${address.port}`);
+//   console.log(`Server ip: ${address.address}`);
+//   console.log(`Server is IP4/IP6: ${address.family}`);
+// });
+
+
+// server.on('close', () => {
+//   console.log('Socket is closed !');
+// });
+
+// server.bind(2222);
+
+
+//  ---------------------------------------express server-----------------------------------------
 expressWebSocket(app, null, {
     perMessageDeflate: false,
 });
@@ -77,12 +79,12 @@ app.ws('/video', function(ws, req) {
     const stream = websocketStream(ws, {
         binary: true,
     });
-  
-    // ffmpeg.stdout.on('data', function (data) {
-    //     try {
-    //         stream.write(data);
-    //     } catch(err){}
-    // });
+
+    ffmpeg.stdout.on('data', function (data) {
+        try {
+            stream.write(data);
+        } catch(err){}
+    });
 });
  
 app.listen(3000, ()=>{
